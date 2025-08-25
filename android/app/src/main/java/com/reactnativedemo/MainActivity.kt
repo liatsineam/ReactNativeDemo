@@ -1,22 +1,36 @@
 package com.reactnativedemo
 
-import com.facebook.react.ReactActivity
-import com.facebook.react.ReactActivityDelegate
-import com.facebook.react.defaults.DefaultNewArchitectureEntryPoint.fabricEnabled
-import com.facebook.react.defaults.DefaultReactActivityDelegate
+import android.os.Bundle
+import android.widget.Button
+import androidx.fragment.app.FragmentActivity
+import com.facebook.react.ReactFragment
+import com.facebook.react.modules.core.DefaultHardwareBackBtnHandler
 
-class MainActivity : ReactActivity() {
+class MainActivity : FragmentActivity(), DefaultHardwareBackBtnHandler {
 
-  /**
-   * Returns the name of the main component registered from JavaScript. This is used to schedule
-   * rendering of the component.
-   */
-  override fun getMainComponentName(): String = "ReactNativeDemo"
+    private lateinit var button: Button
 
-  /**
-   * Returns the instance of the [ReactActivityDelegate]. We use [DefaultReactActivityDelegate]
-   * which allows you to enable New Architecture with a single boolean flags [fabricEnabled]
-   */
-  override fun createReactActivityDelegate(): ReactActivityDelegate =
-      DefaultReactActivityDelegate(this, mainComponentName, fabricEnabled)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.main_activity)
+        button = findViewById(R.id.button)
+        button.setOnClickListener {
+            val reactNativeFragment = ReactFragment.Builder()
+                .setComponentName("HelloWorld")
+                .setLaunchOptions(getLaunchOptions("test message"))
+                .build()
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.reactNativeFragment, reactNativeFragment)
+                .commit()
+        }
+    }
+
+    override fun invokeDefaultOnBackPressed() {
+        super.onBackPressed()
+    }
+
+    private fun getLaunchOptions(message: String) = Bundle().apply {
+        putString("message", message)
+    }
 }
